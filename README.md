@@ -1,127 +1,47 @@
-# 🧠 Prompt as Function
+## Introduction
 
-A lightweight framework for wrapping **LLMs as callable Python functions**, optimized for **on-device inference** using [llama.cpp](https://github.com/ggerganov/llama.cpp).
+Local language models are becoming increasingly viable for real-time inference, but performance bottlenecks—especially on CPU-bound systems—still limit practical use. This project introduces **Prompt-as-Function**, a lightweight Python abstraction that transforms prompts into callable functions. By combining prompt engineering with system-level optimizations such as **KV cache reuse** and **minimal token generation**, we significantly improve inference speed, making even large models like Qwen 7B interactively usable on CPUs.
 
-This repository demonstrates how to use quantized local LLMs as cached functions instead of chatbots.
+The core idea is simple: reuse a long system prompt (the function definition) across many short user inputs (the arguments), enabling the model to skip recomputing the same context every time. This lets you treat local LLMs as **modular, composable microservices**, each one doing fast, bounded tasks like name extraction, classification, or date parsing—on-device, with low latency, and no internet access required.
 
-Long prompt = function definition
+This repo provides:
 
-Short input = function argument
+* A `PromptFunction` class for wrapping prompts as callable Python functions.
+* Support for multiple Qwen models (0.5B to 7B), running on `llama.cpp`.
+* Benchmarking scripts to demonstrate latency gains from prompt reuse.
+* An extensible design that supports both local (`llama.cpp`) and cloud (`openai`) backends.
+* **GitHub Codespaces ready**: preconfigured environment with all dependencies.
+* **One-click experimentation**: run local models in under a minute with no GPU required.
 
-Short output = result
-
-KV cache = reused memory (like compiled code)
-
-Local CPU = fast, private, and inexpensive
-
-
-This pattern enables modular, fast, and predictable LLM use, especially on limited hardware such as laptops, Raspberry Pi, or cloud Codespaces.
-
-## What This Is (and Isn't)
-
-Intended for:
-
-Running small, quantized models
-
-Fast, simple classification or extraction tasks
-
-Avoiding cloud inference latency, cost, and privacy risks
-
-Teaching modular, composable AI design
-
-Not intended for:
-
-Long-form generation
-
-General-purpose chatbots
-
-Complex multi-turn agents
-
-## Why It Works
-
-LLMs typically spend most compute on recomputing the same prompt every time.
-
-By freezing the prompt and preloading the KV cache, then only changing the short input, you avoid repeated computation. This leads to sub-100ms inference times on CPU and allows building many small, reusable AI microfunctions.
-
-This approach requires control over the model and is not feasible with stateless cloud APIs.
-
-This approach enables fast, modular AI microservices like:
-
-```python
-extract_name = PromptFunction("Extract the person's full name from the following sentence:")
-extract_date = PromptFunction("Extract the date mentioned in the following sentence:")
-
-print(extract_name("Emily Zhang arrived in Montreal on March 15, 2021."))
-# Emily Zhang
-
-print(extract_date("Emily Zhang arrived in Montreal on March 15, 2021."))
-# 2021-03-15
-```
-
-## ⚙️ Features
-
-* ✅ CPU-only (runs in GitHub Codespaces!)
-* ✅ KV cache reuse for blazing-fast inference
-* ✅ Works with small models (0.5B – 3B)
-* ✅ Modular design with per-function prompts
-* ✅ No API keys or network calls
-* ✅ Real-time performance for structured tasks
+The result is a practical framework for building **modular, privacy-preserving, low-latency AI utilities** on the edge—with Python and a CPU.
 
 
-## ⚡ KV Cache Reuse Matters
+## Background
 
-This project takes advantage of Llama.cpp’s KV cache by structuring prompts with a consistent system prompt prefix. This allows repeated prompt functions (e.g., extract_name, extract_date) to reuse previously evaluated tokens instead of re-processing the entire prompt each time.
+LLM basics, challenges with local inference, KV cache reuse.
 
-When prompt order is reversed to disable KV cache reuse, inference time increases by 30–40%.
+## Prompt-as-Function Concept
 
-| Prefix-Match | Tokens Reused	| Total Inference Time Range |
-| ------------ | -------------- | -------------------------- |
-| With KV Cache Reuse (Normal)|	17–19 |	~420–700 ms |
-| Without KV Cache Reuse (Reversed Prompt) |	4	| ~650–970 ms |
+Explanation of your abstraction: prompt, max tokens, model selection, template options.
 
-This highlights that prompt structure and cache-friendly formatting are key optimizations for building fast, modular, local LLM-as-microservice workflows.
+## Implementation Details
 
-## 📊 Performance Benchmarks
+Code structure, Python class overview, prompt templating, multi-model support.
 
-This project measures latency of local Qwen models for common NLP tasks like name/date extraction. All tests run **locally on CPU** (2 vCPUs) in GitHub Codespaces using `llama.cpp`.
+## Performance Optimization
 
-### 🔹 Model Latency by Size
+KV cache reuse, prompt reuse, threading, CPU/core utilization.
 
-| Model         | `extract_name` | `extract_date` | Total per Input | Notes           |
-| ------------- | -------------: | -------------: | --------------: | --------------- |
-| **Qwen 0.5B** |     400–800 ms |     600–900 ms |   \~1.2–1.6 sec | Fastest         |
-| **Qwen 1.5B** |    1.0–2.1 sec |    1.7–2.8 sec |   \~2.8–5.0 sec | Higher accuracy |
-| **Qwen 3B**   |    2.4–4.6 sec |    3.5–5.5 sec |  \~6.0–10.0 sec | High CPU load   |
+## Benchmarking Results
 
-> ⏱ Load time is front-loaded once. The above times reflect only **prompt evaluation + generation** using the KV cache.
+Latency tables, model size vs speed, comparison with vanilla approaches, effects of prompt order.
 
-### 📦 Real-World Example
+## Usage
 
-```shell
-$ python main.py
-Emily Zhang
-extract_name: 805.53 ms
-2021-03-15
-extract_date: 1002.82 ms
-```
+Installation instructions, running examples, environment variables.
 
-### ⚖️ Local vs Remote (OpenAI)
+## Future Work
 
-| Method           | Median Latency | Offline | Privacy | Cost           |
-| ---------------- | -------------- | ------- | ------- | -------------- |
-| Local (0.5B CPU) | \~1.2–1.6 sec  | ✅ Yes   | ✅ Full  | ✅ Free         |
-| OpenAI GPT-3.5   | \~1.5–2.5 sec  | ❌ No    | ❌ Risk  | 💲 Token-based |
-| OpenAI GPT-4     | \~3.5–5.0 sec  | ❌ No    | ❌ Risk  | 💲💲 High      |
+Ideas like mobile deployment, WebGPU support, expanded microservice orchestration.
 
----
-
-## 🧩 Why This Matters
-
-This work shows how **small, specialized local models** can outperform remote calls for **micro-tasks** — making AI:
-
-* Faster than waiting on network roundtrips
-* More private (no data leaves the device)
-* Easier to reason about (modular prompt-as-code abstraction)
-
-Ideal for **CS1 education**, **edge AI**, and **low-latency agents**.
-
+## License and Contributions
