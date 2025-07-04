@@ -67,7 +67,19 @@ print(extract_date("Emily Zhang arrived in Montreal on March 15, 2021."))
 * ✅ No API keys or network calls
 * ✅ Real-time performance for structured tasks
 
----
+
+## ⚡ KV Cache Reuse Matters
+
+This project takes advantage of Llama.cpp’s KV cache by structuring prompts with a consistent system prompt prefix. This allows repeated prompt functions (e.g., extract_name, extract_date) to reuse previously evaluated tokens instead of re-processing the entire prompt each time.
+
+When prompt order is reversed to disable KV cache reuse, inference time increases by 30–40%.
+
+| Prefix-Match | Tokens Reused	| Total Inference Time Range |
+| ------------ | -------------- | -------------------------- |
+| With KV Cache Reuse (Normal)|	17–19 |	~420–700 ms |
+| Without KV Cache Reuse (Reversed Prompt) |	4	| ~650–970 ms |
+
+This highlights that prompt structure and cache-friendly formatting are key optimizations for building fast, modular, local LLM-as-microservice workflows.
 
 ## 📊 Performance Benchmarks
 
@@ -112,32 +124,4 @@ This work shows how **small, specialized local models** can outperform remote ca
 * Easier to reason about (modular prompt-as-code abstraction)
 
 Ideal for **CS1 education**, **edge AI**, and **low-latency agents**.
-
----
-
-## 🚀 Quick Start
-
-```bash
-pip install llama-cpp-python
-python main.py
-```
-
-Make sure your `gguf` models are downloaded and paths are correctly set in `prompt_function.py`.
-
----
-
-## 📚 Example Use Cases
-
-* `extract_name`: Full name detection from a sentence
-* `extract_date`: Date detection from mixed formats
-* Extendable to `extract_location`, `summarize`, `flag_sensitive`, etc.
-
----
-
-## 🧠 Credit
-
-Built using [llama.cpp](https://github.com/ggerganov/llama.cpp) and Qwen models from Alibaba. Designed by [Jason Madar](https://github.com/env3d) as part of a CS1 LLM research project.
-
----
-
 

@@ -7,7 +7,7 @@ base_model_paths = ["qwen2.5-0.5b-instruct-q2_k.gguf", "qwen2.5-1.5b-instruct-q2
 class PromptFunction:
     def __init__(self, prompt, model=0):
         self.llm = Llama(model_path=base_model_paths[model],
-                         verbose=False,
+                         verbose=True,
                          n_ctx=256, 
                          n_threads=2)
         self.system_prompt = prompt
@@ -17,7 +17,7 @@ class PromptFunction:
     def __call__(self, input_text):
         prompt = f"""
 <|im_start|>user
-{self.system_prompt} {input_text}
+{input_text} {self.system_prompt} 
 <|im_end|>
 <|im_start|>assistant
 """
