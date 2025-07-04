@@ -1,30 +1,61 @@
+import os, sys
 from llama_cpp import Llama
 
-# Shared base model
-base_model_paths = ["qwen2.5-0.5b-instruct-q2_k.gguf", "qwen2.5-1.5b-instruct-q2_k.gguf", "qwen2.5-3b-instruct-q2_k.gguf", "qwen2.5-7b-instruct-q2_k.gguf"]
-
-# Each function gets its own prompt + LLM wrapper
 class PromptFunction:
-    def __init__(self, prompt, model=0):
-        self.llm = Llama(model_path=base_model_paths[model],
-                         verbose=True,
-                         n_ctx=256, 
-                         n_threads=2)
-        self.system_prompt = prompt
-        # warm the cache
-        self.llm(prompt, max_tokens=1)
+    base_model_paths = [
+        "qwen2.5-0.5b-instruct-q2_k.gguf",
+        "qwen2.5-1.5b-instruct-q2_k.gguf",
+        "qwen2.5-3b-instruct-q2_k.gguf",
+        "qwen2.5-7b-instruct-q2_k.gguf"
+    ]
 
-    def __call__(self, input_text):
-        prompt = f"""
-<|im_start|>user
-{input_text} {self.system_prompt} 
-<|im_end|>
-<|im_start|>assistant
-"""
-        result = self.llm(prompt, max_tokens=20, stop=['\n','<|endoftext|>'])
-        return result['choices'][0]['text'].strip()
+    def __init__(
+        self,
+        prompt: str,
+        model: int = 0,
+        max_tokens: int = 2,
+        temperature: float = 0.0,
+        stop: list = None
+    ):
+        self.prompt = prompt.strip()
+        self.max_tokens = max_tokens
+        self.temperature = temperature
+        self.stop = stop or ['\n', '<|endoftext|>']
+
+        self.template = ("<|im_start|>user\n{prompt}\n{input}\n<|im_end|>\n<|im_start|>assistant\n")
+        if os.getenv("PROMPT_AS_FUNCTION") == "0" :
+            self.template = ("<|im_start|>user\n{input}\n{prompt}\n<|im_end|>\n<|im_start|>assistant\n")
 
 
+
+        # Suppress stderr temporarily
+        stderr = sys.stderr
+        sys.stderr = open(os.devnull, 'w')
+
+        self.llm = Llama(
+            model_path=self.base_model_paths[model],
+            verbose=False,
+            n_ctx=256,
+            n_threads=os.cpu_count()
+        )
+        
+        sys.stderr = stderr  # Restore stderr
+
+        # Warm the cache with a dummy call
+        warmup_prompt = self.template.format(prompt=self.prompt, input="")
+        _ = self.llm(warmup_prompt, max_tokens=1, stop=self.stop, temperature=self.temperature)
+
+    def __call__(self, input_text: str) -> str:
+        full_prompt = self.template.format(prompt=self.prompt, input=input_text.strip())
+        result = self.llm(
+            full_prompt,
+            max_tokens=self.max_tokens,
+            temperature=self.temperature,
+            stop=self.stop
+        )
+        return result['choices'][0]['text'].strip().lower()
+
+### Utilitiy class for benchmarking
 
 import time
 from contextlib import contextmanager
@@ -32,7 +63,4 @@ from contextlib import contextmanager
 @contextmanager
 def timer(label="Elapsed time"):
     start = time.perf_counter()
-    yield
-    end = time.perf_counter()
-    elapsed_ms = (end - start) * 1000
-    print(f"{label}: {elapsed_ms:.2f} ms")
+    yield lambda: (time.perf_counter() - start) * 1000
