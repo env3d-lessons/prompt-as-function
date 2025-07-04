@@ -1,3 +1,12 @@
+## TL;DR
+
+Run small LLMs locally on CPU as callable Python functions with sub-second latency using KV cache reuse.
+✅ No GPU
+✅ No internet
+✅ Works with Qwen 0.5B–7B via llama.cpp
+✅ GitHub Codespaces ready — run AI models for no cost!!
+✅ Great for microtasks like classification, extraction, or prompt chaining
+
 ## Introduction
 
 Local language models are becoming increasingly viable for real-time inference, but performance bottlenecks—especially on CPU-bound systems—still limit practical use. This project introduces **Prompt-as-Function**, a lightweight Python abstraction that transforms prompts into callable functions. By combining prompt engineering with system-level optimizations such as **KV cache reuse** and **minimal token generation**, we significantly improve inference speed, making even large models like Qwen 7B interactively usable on CPUs.
