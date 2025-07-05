@@ -248,7 +248,7 @@ Below are results comparing different Qwen models under various configurations. 
 
 ---
 
-### ⚡ Fastest Model: Qwen 0.5B with Prompt-as-Function Enabled
+### Fastest Model: Qwen 0.5B with Prompt-as-Function Enabled
 
 ```bash
 $ python extract_categories.py 0
@@ -330,11 +330,11 @@ $ PROMPT_AS_FUNCTION=0 python extract_categories.py 0
 | Burger King | restaurant | 1182.32 |
 | eBay | ebay | 1251.83 |
 
-> ⚠️ Inference time balloons to over **1 second per query**, despite being the same model and hardware.
+> Inference time balloons to over **1 second per query**, despite being the same model and hardware.
 
 ---
 
-### 📈 Scaling Up: Larger Models (All Use Prompt-as-Function)
+### Scaling Up: Larger Models (All Use Prompt-as-Function)
 
 #### Qwen 1.5B
 
@@ -375,7 +375,7 @@ $ python extract_categories.py 1
 | Burger King | grocery | 523.52 |
 | eBay | grocery | 508.22 |
 
-> 💡 Steady performance in the **400–600ms** range. Still usable for batch processing.
+> Steady performance in the **400–600ms** range. Still usable for batch processing.
 
 ---
 
@@ -419,7 +419,7 @@ $ python extract_categories.py 2
 | Burger King | delivery | 1089.65 |
 | eBay | electronics | 929.69 |
 
-> 🧠 More semantic nuance at the cost of latency. All calls stay **under 1.2 seconds**.
+> More semantic nuance at the cost of latency. All calls stay **under 1.2 seconds**.
 
 ---
 
@@ -462,7 +462,7 @@ $ python extract_categories.py 3
 | Burger King | restaurant | 2458.64 |
 | eBay | telecom | 2168.95 |
 
-> 🐘 This is **7 billion parameters** running interactively on CPU! The response times (2–2.6s) are within tolerable range for some real-time workflows.
+> This is **7 billion parameters** running interactively on CPU! The response times (2–2.6s) are within tolerable range for some real-time workflows.
 
 ---
 
@@ -548,7 +548,7 @@ And from their dedicated (and highly technical) [Prompt Caching Guide](https://p
 
 They are *absolutely describing* KV cache reuse, modular prompt design, and function-like behavior — but only as **performance tips**, not as a conceptual or pedagogical framework.
 
-### 🔧 Why This Matters for You
+### Why This Matters for You
 
 You’re taking what OpenAI treats as backend optimization and saying:
 
