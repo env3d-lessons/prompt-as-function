@@ -2,7 +2,7 @@
 
 **Prompt-as-Function** is a lightweight abstraction for turning prompts into callable Python functions — built for:
 
-* **Educators** teaching AI concepts in CS1 or intro programming
+* **Educators** teaching AI concepts in programming classes
 * **Engineers** experimenting with local LLMs and fast inference
 * **Prompt engineers** looking for repeatable, testable workflows
 
