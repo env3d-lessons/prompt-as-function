@@ -45,30 +45,32 @@ By **reusing the prompt portion via KV cache**, we dramatically reduce latency f
 
 ## How It Works
 
-Most large language models works via a chat interface.  In a single turn conversation, we can be captured it as a `chat()` function that takes a string as input and output a string representing the answer:
+Most large language models are accessed through a chat interface. For single-turn conversations, this naturally maps to a simple `chat()` function that takes a string as input and returns a string response:
 
 ```python
-answer = chat('Ottawa is the Capital city of which Country?')
-print(answer) # Canada
+answer = chat('Ottawa is the capital city of which country?')
+print(answer)  # Canada
 ```
 
-using **[llama.cpp](https://github.com/ggerganov/llama.cpp)** and the llama-cpp-python binding, we can create this chat function fairly easily.  However, you are not going to get good performance if you use this chat function like a chatbot.
+Using **[llama.cpp](https://github.com/ggerganov/llama.cpp)** with the `llama-cpp-python` bindings, we can define this `chat()` function locally. However, if we treat this like a chatbot—sending each query as a fresh, full prompt—we won't get great performance, especially on CPU.
 
-You can try it yourself by running `chat.py`, it's a small python program that demonstrate loading of the Qwen 3B parameter 2-bit quantized model with 2 calls to the chat() function, each one asking the LLM to identify the country of a city.  Specifically, we make the following series of calls:
+To demonstrate this, you can run `chat.py`. This script loads the Qwen 2.5 7B model (2-bit quantized) and performs several calls to the `chat()` function, asking for the country corresponding to a capital city.
+
+Here’s a sample of the queries:
 
 ```python
 print("Chat calls when query is in natural language:")
 print(chat('Ottawa is the capital city of which country? Output only the country name.'))
 print(chat('Give me the country name where Tokyo is the capital city of? Output only the country name.'))
-print(chat('Which country is Beijing is the capital city of? Output only the country name.'))
+print(chat('Which country is Beijing the capital of? Output only the country name.'))
 
-print("Chat calls with query is structured, with variable query term at the end:")
-print(chat('For the following capital city, output the country name the city belongs to, output only the name: Ottawa'))
-print(chat('For the following capital city, output the country name the city belongs to, output only the name: Tokyo'))
-print(chat('For the following capital city, output the country name the city belongs to, output only the name: Beijing'))
+print("Chat calls with structured prompt, varying only the input term:")
+print(chat('For the following capital city, output the country name it belongs to. Output only the name: Ottawa'))
+print(chat('For the following capital city, output the country name it belongs to. Output only the name: Tokyo'))
+print(chat('For the following capital city, output the country name it belongs to. Output only the name: Beijing'))
 ```
 
-Below is the output when run in codespaces:
+When run in GitHub Codespaces, the output looks like this:
 
 ```
 $ python chat.py
@@ -80,7 +82,7 @@ Chat call: 2783.27 ms
 Japan
 Chat call: 2283.55 ms
 China
-Chat calls with query is structured, with variable query term at the end:
+Chat calls with structured prompt, varying only the input term:
 Chat call: 2819.05 ms
 Canada
 Chat call: 857.70 ms
@@ -89,16 +91,21 @@ Chat call: 755.26 ms
 China
 ```
 
-A couple of interesting observations:
+### What’s Happening?
 
-  * It seems like there's a speed up effect after the first call in both cases
-  * For the first batch where query is somewhat unstructured, not counting the first call, the time for each query is between 2.5 to 3 seconds
-  * For the second batch, once again not counting the first call, the time for each query is dramatically lower, less that 1 second!
+A few key observations:
 
-This speed up in the second batch is purely due to prompt structure.  It turns out within llama.cpp, and really all inference systems, there is a mechanism called kv-cache used to speed up token generation.  As long as the prefix is **unchanged**, it is cached and subsequent calls are speed up because the inference system can pick up where it left off.
+* There’s a noticeable speedup after the first call in both sets — the model gets faster even within a session.
+* For unstructured queries, calls (after warmup) still take 2.5–3 seconds each.
+* For structured prompts where only the final input differs, latency drops dramatically — under 1 second per query!
 
-So if we are asking the same question over and over again, say processing something in batch, if we structure our prompts right, we can actually run local models with reasonable speed.
+This performance improvement in the second batch comes entirely from **prompt structure**.
 
+The key insight: local LLMs (via `llama.cpp`) use a **KV cache** to avoid recomputing previously seen tokens. If your prompt has a **fixed prefix**, the model can reuse that part of the computation across calls — resulting in a huge speedup.
+
+So when running multiple similar queries (e.g. batch processing), if you structure your prompts so only the final input changes, you can dramatically boost performance — even on CPU.
+
+This is the core principle behind **Prompt-as-Function**. By rephrasing natural language prompts into templated functional calls, we unlock KV cache reuse, making on-device inference not just possible, but practical.
 
 
 ## Implementation Details
