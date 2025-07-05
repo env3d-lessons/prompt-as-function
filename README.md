@@ -442,6 +442,39 @@ $ python extract_categories.py 3
 * Performance scales **predictably** with model size, but remains manageable thanks to KV cache reuse.
 * You don’t need a GPU. With smart prompt structuring and llama.cpp’s efficiency, **CPU-only inference is fast enough** for many practical applications.
 
+## Extending the Framework: LLM Microservices Architecture
+
+Beyond single-function prompting, this framework supports a microservices-style architecture, where multiple PromptFunction instances—each with a different system prompt and dedicated KV cache—run in parallel as independent, callable units.
+
+Each PromptFunction wraps its own model context, optimized for a specific task (e.g., name extraction, date parsing). Because llama.cpp maintains separate KV caches per instance, these models can run concurrently with minimal overhead, enabling composable AI pipelines entirely on-device.
+
+For example, in extract_multi.py, we define two PromptFunctions: one to extract a name, and another to extract a date from the same input sentence:
+
+extract_name = PromptFunction("Extract the person's full name...", model=0, max_tokens=5)
+extract_date = PromptFunction("Extract the date mentioned...", model=0, max_tokens=20)
+
+Both are evaluated independently for each input, using their own prompt prefix and reusing their respective KV caches. This results in fast, parallel function-like behavior with predictable latency.
+
+Sample output (CPU-only, Qwen 0.5B model):
+
+| Emily Zhang | 2021-03-15 | 483.24 | 691.42 |
+| Carlos Rivera | 2023-08-03 | 470.13 | 685.01 |
+
+**note**: the latency for this task is higher due to input being longer
+
+### Why This Matters
+
+This architecture transforms local LLMs into a suite of reusable, cache-primed AI utilities, each behaving like a microservice. By decoupling model context and purpose, we unlock:
+
+Composable pipelines: Chain prompt functions for structured multi-step tasks.
+
+Interactive performance: Maintain <600ms latency per function, even on CPU.
+
+Deployment flexibility: Run multiple functions in memory without GPU or network access.
+
+
+This approach brings the modularity of cloud-based AI pipelines to the edge—all with local inference, zero dependencies, and full privacy.
+
 ## Conclusion
 
 This project demonstrates a simple but powerful optimization: by treating prompts as **functions with fixed prefixes**, we can exploit the KV cache in `llama.cpp` to drastically improve the performance of local inference — even on CPUs.
