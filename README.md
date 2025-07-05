@@ -2,17 +2,17 @@
 
 **Prompt-as-Function** is a lightweight abstraction for turning prompts into callable Python functions — built for:
 
-* 🧑‍🏫 **Educators** teaching AI concepts in CS1 or intro programming
-* 🛠️ **Engineers** experimenting with local LLMs and fast inference
-* 💡 **Prompt engineers** looking for repeatable, testable workflows
+* **Educators** teaching AI concepts in CS1 or intro programming
+* **Engineers** experimenting with local LLMs and fast inference
+* **Prompt engineers** looking for repeatable, testable workflows
 
 It runs entirely **offline**, uses **tiny quantized models**, and supports real-time experimentation — even on CPU.
 
-> ⚡️ Think: `def extract_category(text):` — powered by a small local LLM, ready to run in under 200ms.
+> Think: `def extract_category(text):` — powered by a small local LLM, ready to run in under 200ms.
 
 Whether you're teaching **temperature tuning** to undergrads or building **modular AI tools** on the edge, Prompt-as-Function provides a clear, reproducible way to think about and work with language models.
 
-## 🎬 See It in Action
+## See It in Action
 
 [![Watch the demo](https://img.youtube.com/vi/VwexyiDT8Ic/maxresdefault.jpg)](https://youtu.be/VwexyiDT8Ic)
 
