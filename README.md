@@ -12,6 +12,14 @@ It runs entirely **offline**, uses **tiny quantized models**, and supports real-
 
 Whether you're teaching **temperature tuning** to undergrads or building **modular AI tools** on the edge, Prompt-as-Function provides a clear, reproducible way to think about and work with language models.
 
+## 🎬 See It in Action
+
+[![Watch the demo](https://img.youtube.com/vi/VwexyiDT8Ic/maxresdefault.jpg)](https://youtu.be/VwexyiDT8Ic)
+
+*3:30 complete walkthrough: GitHub → Codespaces → Running 7B models (download time included for full transparency)*
+
+The video shows the real, unedited experience - including the 3-minute model download and the actual sub-200ms inference times.
+
 ## Introduction
 
 Local language models are becoming increasingly viable for real-time inference, but performance bottlenecks—especially on CPU-bound systems—still limit practical use. This project introduces **Prompt-as-Function**, a lightweight Python abstraction that transforms prompts into callable functions. By combining prompt engineering with system-level optimizations such as **KV cache reuse** and **minimal token generation**, we significantly improve inference speed, making even large models like Qwen 7B interactively usable on CPUs.
