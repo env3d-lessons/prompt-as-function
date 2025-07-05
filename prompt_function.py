@@ -1,13 +1,54 @@
 import os, sys
+import subprocess
 from llama_cpp import Llama
 
+# Global model configuration
+MODEL_URLS = {
+    "qwen2.5-0.5b-instruct-q2_k.gguf": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q2_k.gguf",
+    "qwen2.5-1.5b-instruct-q2_k.gguf": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q2_k.gguf", 
+    "qwen2.5-3b-instruct-q2_k.gguf": "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q2_k.gguf",
+    "qwen2.5-7b-instruct-q2_k.gguf": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/main/qwen2.5-7b-instruct-q2_k.gguf"
+}
+
+
+### Utilities for benchmarking and model downloads ###
+
+import time
+from contextlib import contextmanager
+
+@contextmanager
+def timer(label="Elapsed time"):
+    start = time.perf_counter()
+    yield lambda: (time.perf_counter() - start) * 1000
+
+
+def download_models_if_needed():
+    """Download model files if they are not present locally."""
+    
+    for model_file, url in MODEL_URLS.items():
+        if not os.path.exists(model_file):
+            print(f"Model {model_file} not found. Downloading...")
+            try:
+                # Use wget with -nc (no-clobber) to avoid re-downloading if file exists
+                subprocess.run(["wget", "-nc", url], check=True)
+                print(f"Successfully downloaded {model_file}")
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to download {model_file}: {e}")
+                sys.exit(1)
+            except FileNotFoundError:
+                print("wget command not found. Please install wget or download the models manually.")
+                sys.exit(1)
+        else:
+            print(f"Model {model_file} already exists.")
+
+
+### -- Start of the main functionality -- ###
+
+# Download models if needed when the module is imported
+download_models_if_needed()
+
 class PromptFunction:
-    base_model_paths = [
-        "qwen2.5-0.5b-instruct-q2_k.gguf",
-        "qwen2.5-1.5b-instruct-q2_k.gguf",
-        "qwen2.5-3b-instruct-q2_k.gguf",
-        "qwen2.5-7b-instruct-q2_k.gguf"
-    ]
+    base_model_paths = list(MODEL_URLS.keys())
 
     def __init__(
         self,
@@ -54,13 +95,3 @@ class PromptFunction:
             stop=self.stop
         )
         return result['choices'][0]['text'].strip().lower()
-
-### Utilitiy class for benchmarking
-
-import time
-from contextlib import contextmanager
-
-@contextmanager
-def timer(label="Elapsed time"):
-    start = time.perf_counter()
-    yield lambda: (time.perf_counter() - start) * 1000

@@ -457,8 +457,10 @@ Both are evaluated independently for each input, using their own prompt prefix a
 
 Sample output (CPU-only, Qwen 0.5B model):
 
+```
 | Emily Zhang | 2021-03-15 | 483.24 | 691.42 |
 | Carlos Rivera | 2023-08-03 | 470.13 | 685.01 |
+```
 
 **note**: the latency for this task is higher due to input being longer
 
