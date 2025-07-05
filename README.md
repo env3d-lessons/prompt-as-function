@@ -1,3 +1,17 @@
+## Prompt-as-Function: A Minimal, Fast, Local Runtime for Prompt Engineering and AI Literacy
+
+**Prompt-as-Function** is a lightweight abstraction for turning prompts into callable Python functions — built for:
+
+* 🧑‍🏫 **Educators** teaching AI concepts in CS1 or intro programming
+* 🛠️ **Engineers** experimenting with local LLMs and fast inference
+* 💡 **Prompt engineers** looking for repeatable, testable workflows
+
+It runs entirely **offline**, uses **tiny quantized models**, and supports real-time experimentation — even on CPU.
+
+> ⚡️ Think: `def extract_category(text):` — powered by a small local LLM, ready to run in under 200ms.
+
+Whether you're teaching **temperature tuning** to undergrads or building **modular AI tools** on the edge, Prompt-as-Function provides a clear, reproducible way to think about and work with language models.
+
 ## Introduction
 
 Local language models are becoming increasingly viable for real-time inference, but performance bottlenecks—especially on CPU-bound systems—still limit practical use. This project introduces **Prompt-as-Function**, a lightweight Python abstraction that transforms prompts into callable functions. By combining prompt engineering with system-level optimizations such as **KV cache reuse** and **minimal token generation**, we significantly improve inference speed, making even large models like Qwen 7B interactively usable on CPUs.
@@ -159,12 +173,13 @@ Here’s a sample benchmark for classifying 30 common merchants using a 0.5B mod
 
 ```bash
 $ python extract_categories.py 0
+```
+
 | Merchant | Category | Elapse Time (ms) |
 | -------- | -------- | ---------------- |
 | Amazon   | retail   | 172.74 |
 | Starbucks| retail   | 179.92 |
 ...
-```
 
 Most calls complete in \~150–200ms — all on CPU, without GPU acceleration.  Detailed benchmark results can be found in the "Benchmarking Results" section.
 
@@ -174,8 +189,9 @@ This repo is designed to run directly on **GitHub Codespaces**. Simply **fork** 
 
 All software setup is handled automatically via the `.devcontainer/` directory. In particular:
 
-* The `install.sh` script installs all dependencies and downloads Qwen models.
-* Prebuilt `llama.cpp` shared libraries (`.so` files) are included, so there is **no need to compile llama.cpp yourself**.
+* The `install.sh` script installs all dependencies.
+* Prebuilt `llama.cpp` shared libraries (`.so` files) are included, so there is **no need to compile llama.cpp yourself**.  Resulting in fast codespaces startup times.
+* When you run the first script, it will automatically download the Qwen2.5 models (0.5B, 1.5B, 3B, 7B) from Hugging Face - no need to manually download them.
 
 ### Included Files
 
@@ -436,7 +452,7 @@ $ python extract_categories.py 3
 
 ---
 
-### Key Takeaways
+### Key Observations
 
 * The **Prompt-as-Function** design turns local LLMs into usable microservices — especially valuable for structured tasks like classification or extraction.
 * Performance scales **predictably** with model size, but remains manageable thanks to KV cache reuse.
@@ -450,30 +466,42 @@ Each PromptFunction wraps its own model context, optimized for a specific task (
 
 For example, in extract_multi.py, we define two PromptFunctions: one to extract a name, and another to extract a date from the same input sentence:
 
+```python
 extract_name = PromptFunction("Extract the person's full name...", model=0, max_tokens=5)
 extract_date = PromptFunction("Extract the date mentioned...", model=0, max_tokens=20)
+```
 
 Both are evaluated independently for each input, using their own prompt prefix and reusing their respective KV caches. This results in fast, parallel function-like behavior with predictable latency.
 
 Sample output (CPU-only, Qwen 0.5B model):
 
 ```
-| Emily Zhang | 2021-03-15 | 483.24 | 691.42 |
-| Carlos Rivera | 2023-08-03 | 470.13 | 685.01 |
+$ python extract_multi.py 
 ```
+
+| name | date | elapsed time in ms (name) | elapsed time in ms (date) |
+| ---- | ---- | ------------------------- | ------------------------- |
+| emily zhang | 2021-03-15 | 450.86 | 723.31 |
+| carlos rivera | 2023-08-03 | 442.81 | 784.12 |
+| sophie dubois | 2020-07-01 | 626.29 | 843.01 |
+| arjun patel | 2022-11-12 | 529.70 | 707.67 |
+| li wei | 2019-05-09 | 383.27 | 631.18 |
+| michael thompson | 2024-02-28 | 424.01 | 726.77 |
+| amara okafor | 2023-06-10 | 570.28 | 730.13 |
+| benjamin lee | 2018-10-05 | 547.51 | 705.74 |
+| fatima hassan | 2022-09-14 | 446.33 | 666.58 |
+| hiroshi tanaka | 2021-12-31 | 518.17 | 711.34 |
+
 
 **note**: the latency for this task is higher due to input being longer
 
-### Why This Matters
+### Architectural Implications
 
 This architecture transforms local LLMs into a suite of reusable, cache-primed AI utilities, each behaving like a microservice. By decoupling model context and purpose, we unlock:
 
-Composable pipelines: Chain prompt functions for structured multi-step tasks.
-
-Interactive performance: Maintain <600ms latency per function, even on CPU.
-
-Deployment flexibility: Run multiple functions in memory without GPU or network access.
-
+ * Composable pipelines: Chain prompt functions for structured multi-step tasks.
+ * Interactive performance: Maintain ~600ms latency for name extract and ~800ms for date extraction, even on CPU.
+ * Deployment flexibility: Run multiple functions in memory without GPU or network access.
 
 This approach brings the modularity of cloud-based AI pipelines to the edge—all with local inference, zero dependencies, and full privacy.
 

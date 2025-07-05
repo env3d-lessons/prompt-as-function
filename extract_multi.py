@@ -22,7 +22,8 @@ test_inputs = [
     "We last heard from Hiroshi Tanaka on December 31st, 2021."
 ]
 
-print('| name | date | elapsed time in ms (name) | elapsed time in ms (date)')
+print('| name | date | elapsed time in ms (name) | elapsed time in ms (date) |')
+print('| ---- | ---- | ------------------------- | ------------------------- |')
 for input in test_inputs:
     with timer() as get_time_name:
         n = extract_name(input)

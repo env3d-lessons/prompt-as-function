@@ -25,21 +25,30 @@ def timer(label="Elapsed time"):
 def download_models_if_needed():
     """Download model files if they are not present locally."""
     
+    # Check if any models need to be downloaded
+    missing_models = [model_file for model_file in MODEL_URLS.keys() if not os.path.exists(model_file)]
+    
+    if missing_models:
+        print("📥 First-time setup: Downloading 4 models (this only happens once)...")
+        print("=" * 60)
+    
     for model_file, url in MODEL_URLS.items():
         if not os.path.exists(model_file):
-            print(f"Model {model_file} not found. Downloading...")
+            print(f"Downloading {model_file}...")
             try:
-                # Use wget with -nc (no-clobber) to avoid re-downloading if file exists
-                subprocess.run(["wget", "-nc", url], check=True)
-                print(f"Successfully downloaded {model_file}")
+                # Use wget with -nc (no-clobber) and --progress=bar to show only progress
+                subprocess.run(["wget", "-nc", "--progress=bar:force", "-q", url], check=True)
+                print(f"✅ Successfully downloaded {model_file}")
             except subprocess.CalledProcessError as e:
-                print(f"Failed to download {model_file}: {e}")
+                print(f"❌ Failed to download {model_file}: {e}")
                 sys.exit(1)
             except FileNotFoundError:
-                print("wget command not found. Please install wget or download the models manually.")
+                print("❌ wget command not found. Please install wget or download the models manually.")
                 sys.exit(1)
-        else:
-            print(f"Model {model_file} already exists.")
+    
+    if missing_models:
+        print("=" * 60)
+        print("🎉 Model setup complete! Future runs will be much faster.")
 
 
 ### -- Start of the main functionality -- ###
