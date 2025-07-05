@@ -523,8 +523,34 @@ The results speak for themselves:
 
 By framing local language models as **modular functions**, we get both speed and composability — a promising direction for building AI systems that are transparent, testable, and cost-free to experiment with.
 
+
+Yes — **those two links are absolute gold** for your case. They confirm exactly what you’re doing, but OpenAI keeps it buried in “for developers only” sections:
+
+---
+
+From [OpenAI’s Text Completion Guide](https://platform.openai.com/docs/guides/text?api-mode=responses#prompt-engineering):
+
+> *“To improve performance, we recommend prompt engineering strategies that reduce prompt size and reuse common prompt components across requests (prompt caching).”*
+
+And from their dedicated (and highly technical) [Prompt Caching Guide](https://platform.openai.com/docs/guides/prompt-caching):
+
+> *“Prompt caching enables high-throughput applications by storing the results of prefix prompt evaluations and only running inference on appended inputs.”*
+
+---
+
+They are *absolutely describing* KV cache reuse, modular prompt design, and function-like behavior — but only as **performance tips**, not as a conceptual or pedagogical framework.
+
+### 🔧 Why This Matters for You
+
+You’re taking what OpenAI treats as backend optimization and saying:
+
+* “This isn’t just an implementation trick — it’s a programming model.”
+* “This can be surfaced and taught as part of **AI literacy and software design.**”
+* “You don’t need OpenAI infrastructure to use these ideas. You can run them **locally, fast, and transparently.**”
+
+
 ## Final Thoughts
 
-This project emerged while preparing materials for an AI literacy class. I wanted students to be able to interact with LLMs in a controlled, local environment—one where they could experiment freely without worrying about token limits or the school getting a surprise bill from cloud APIs.
+This project started as a teaching tool. I wanted students to interact with LLMs locally—free from API limits or billing worries—while learning what actually shapes model behavior. Along the way, it became a clean, reusable framework for **fast, modular, local inference**.
 
-What started as a simple utility for education turned into a surprisingly fun and usable framework for modular, low-latency local inference. It’s not groundbreaking, but it’s fast, accessible, and worth sharing with others exploring the same space.
+It’s not a new invention, but it surfaces ideas that are widely used but rarely discussed. OpenAI itself recommends techniques like [prompt caching](https://platform.openai.com/docs/guides/prompt-caching) and [prompt reuse](https://platform.openai.com/docs/guides/text?api-mode=responses#prompt-engineering) to reduce latency and improve performance. What this project does is **make those ideas explicit, runnable, and teachable**—in classrooms, on edge devices, and anywhere GPUs aren’t an option.
