@@ -66,41 +66,47 @@ To demonstrate this, you can run `chat.py`. This script loads the Qwen 2.5 7B mo
 Here’s a sample of the queries:
 
 ```python
-print("Chat calls when query is in natural language:")
+# Unstructured queries
 print(chat('Ottawa is the capital city of which country? Output only the country name.'))
-print(chat('Give me the country name where Tokyo is the capital city of? Output only the country name.'))
-print(chat('Which country is Beijing the capital of? Output only the country name.'))
+print(chat('Give me the country name where Tokyo is the capital city of? Output only the country name.))
+print(chat('Which country is Beijing is the capital city of? Output only the country name.'))
 
-print("Chat calls with structured prompt, varying only the input term:")
-print(chat('For the following capital city, output the country name it belongs to. Output only the name: Ottawa'))
-print(chat('For the following capital city, output the country name it belongs to. Output only the name: Tokyo'))
-print(chat('For the following capital city, output the country name it belongs to. Output only the name: Beijing'))
+# Structured queries
+print(chat('For the following capital city, output the country name the city belongs to, output only the name: Ottawa'))
+print(chat('For the following capital city, output the country name the city belongs to, output only the name: Tokyo'))
+print(chat('For the following capital city, output the country name the city belongs to, output only the name: Beijing'))
+
 ```
 
 When run in GitHub Codespaces, the output looks like this:
 
 ```
 $ python chat.py
-Model load time: 15600.32 ms
-Chat calls when query is in natural language:
-Chat call: 14110.52 ms
-Canada
-Chat call: 5816.95 ms
-Japan
-Chat call: 5514.24 ms
-China
-Chat calls with query is structured, with variable query term at the end:
-Chat call: 6479.86 ms
-Canada
-Chat call: 1668.18 ms
-Japan
-Chat call: 1691.83 ms
-China
+Model load time: 15445.94 ms
+
+============================================================
+🗣️  NATURAL LANGUAGE QUERIES
+============================================================
+Chat call: 13023.34 ms
+Ottawa query result: Canada
+Chat call: 5994.40 ms
+Tokyo query result:  Japan
+Chat call: 5159.83 ms
+Beijing query result: China
+
+============================================================
+🏗️  STRUCTURED QUERIES (variable at end)
+============================================================
+Chat call: 6221.88 ms
+Ottawa → Canada
+Chat call: 1677.91 ms
+Tokyo → Japan
+Chat call: 1688.95 ms
+Beijing → China
+============================================================
 ```
 
-### What’s Happening?
-
-A few key observations:
+### Key Observations
 
 * There’s a noticeable speedup after the first call in both sets — the model gets faster even within a session.
 * For unstructured queries, calls (after warmup) still take > 5 seconds each.
