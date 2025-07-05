@@ -487,4 +487,8 @@ The results speak for themselves:
 
 By framing local language models as **modular functions**, we get both speed and composability — a promising direction for building AI systems that are transparent, testable, and cost-free to experiment with.
 
-This repo is a starting point. From here, more can be built: cascaded prompt pipelines, on-device data cleaning, or even real-time agents — all leveraging the same simple principle: **prompt structure matters**.
+## Final Thoughts
+
+This project emerged while preparing materials for an AI literacy class. I wanted students to be able to interact with LLMs in a controlled, local environment—one where they could experiment freely without worrying about token limits or the school getting a surprise bill from cloud APIs.
+
+What started as a simple utility for education turned into a surprisingly fun and usable framework for modular, low-latency local inference. It’s not groundbreaking, but it’s fast, accessible, and worth sharing with others exploring the same space.
