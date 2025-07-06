@@ -242,20 +242,20 @@ Your benchmarking results are thorough and compelling. Here's an improved and pr
 
 We benchmarked several **Qwen models** running **locally on CPU** inside GitHub Codespaces using the `PromptFunction` wrapper. This wrapper reuses the **KV cache** to dramatically reduce inference time.  Detailed benchmarking results can be found at [BENCHMARK.md](BENCHMARK.md).  Below are the summary of the results:
 
-* ✅ **Prompt-as-function optimization** reduces latency by **5–6×**, even for small models.
-* 🧠 **Qwen 0.5B** with caching achieves **<200ms** inference—**faster than OpenAI API calls**.
-* ⚡ Even a **7B model** becomes usable interactively on CPU, with **\~2s** response time.
-* 🚫 Disabling caching causes **0.5B** to slow down to **>1s per query**.
+* **Prompt-as-function optimization** reduces latency by **5–6×**, even for small models.
+* **Qwen 0.5B** with caching achieves **<200ms** inference—**faster than OpenAI API calls**.
+* Even a **7B model** becomes usable interactively on CPU, with **\~2s** response time.
+* Disabling caching causes **0.5B** to slow down to **>1s per query**.
 
 ### Performance by Model Size
 
 | Model     | Prompt-as-Function | Typical Latency | Notes                              |
 | --------- | ------------------ | --------------- | ---------------------------------- |
-| Qwen 0.5B | ✅ Enabled          | **150–250ms**   | Fastest; ideal for local functions |
-| Qwen 0.5B | ❌ Disabled         | **\~1100ms**    | 5–6× slower without caching        |
-| Qwen 1.5B | ✅ Enabled          | **400–600ms**   | Great balance of speed and depth   |
-| Qwen 3B   | ✅ Enabled          | **850–1200ms**  | Richer output, still responsive    |
-| Qwen 7B   | ✅ Enabled          | **1900–2600ms** | Usable for interactive CPU tasks   |
+| Qwen 0.5B | Enabled          | **150–250ms**   | Fastest; ideal for local functions |
+| Qwen 0.5B | Disabled         | **\~1100ms**    | 5–6× slower without caching        |
+| Qwen 1.5B | Enabled          | **400–600ms**   | Great balance of speed and depth   |
+| Qwen 3B   | Enabled          | **850–1200ms**  | Richer output, still responsive    |
+| Qwen 7B   | Enabled          | **1900–2600ms** | Usable for interactive CPU tasks   |
 
 All benchmarks were run on **CPU-only GitHub Codespaces**, with minimal memory and no GPU acceleration.
 
