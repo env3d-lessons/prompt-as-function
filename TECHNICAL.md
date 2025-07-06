@@ -6,9 +6,9 @@ This document captures the technical design behind the "prompt-as-function" appr
 
 Reasons why the technical implementation is simple is efficient:
 
- * Attention head calculations are independent of the feed forward network (transformer architecture)
- * llama.cpp already implemented caching at the attention head level (kv-cache)
- * Multiple instances of llama.cpp leverage battle tested CPU based memory management (mmap, copy-on-write) for multiple threads/processes
+* Attention head calculations are independent of the feed forward network (transformer architecture)
+* llama.cpp already implemented caching at the attention head level (kv-cache)
+* Multiple instances of llama.cpp leverage battle tested CPU based memory management (mmap, copy-on-write) for multiple threads/processes
 
 ---
 
