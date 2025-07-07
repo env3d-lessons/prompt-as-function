@@ -22,7 +22,7 @@ The video shows the real, unedited experience - including the 3-minute model dow
 
 ## Introduction
 
-Local language models are becoming increasingly viable for real-time inference, but performance bottlenecks—especially on CPU-bound systems—still limit practical use.  This project demonstrates how to leverage KV cache reuse—a standard optimization in production LLM systems—for local inference through a clean Python abstraction. While cloud APIs like OpenAI already use these techniques internally, we make them explicit and accessible for developers running models locally with llama.cpp. The result is dramatically improved inference speed, making even large models like Qwen 7B interactively usable on CPUs.
+Local language models are becoming increasingly viable for real-time inference, but performance bottlenecks, especially on CPU-bound systems, still limit practical use.  This project demonstrates how to leverage KV cache reuse — a standard optimization in production LLM systems — for local inference through a clean Python abstraction. While cloud APIs like OpenAI already use these techniques internally, we make them explicit and accessible for developers running models locally with llama.cpp. The result is dramatically improved inference speed, making even large models like Qwen 7B interactively usable on CPUs.
 
 The core idea is simple: reuse a long system prompt (the function definition) across many short user inputs (the arguments), enabling the model to skip recomputing the same context every time. This lets you treat local LLMs as **modular, composable microservices**, each one doing fast, bounded tasks like name extraction, classification, or date parsing—on-device, with low latency, and no internet access required.
 
@@ -58,7 +58,7 @@ By **reusing the prompt portion via KV cache**, we dramatically reduce latency f
 
 ## How It Works
 
-See [TECHNICAL.md](TECHNICAL.md) for a detailed dicsussion on why it works so well.
+*See [TECHNICAL.md](TECHNICAL.md) for a detailed discussion on why it works so well.*
 
 Most large language models are accessed through a chat interface. For single-turn conversations, this naturally maps to a simple `chat()` function that takes a string as input and returns a string response:
 
